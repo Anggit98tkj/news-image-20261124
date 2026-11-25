@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/news-image-20261124/Anggit98tkj/news-image-20261124/rank.svg)](https://make.fun/bounty/news-image-20261124/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261124)
 [![reward](https://make.fun/badge/news-image-20261124/Anggit98tkj/news-image-20261124/reward.svg)](https://make.fun/bounty/news-image-20261124?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261124)
 
-A 1024x1024 front page that sums up Tuesday 24 November 2026 in one image. The program draws the page from scratch with Python and Pillow: masthead, date line, lead story, four story cards and a closing strip, with a small pictogram drawn in code for every story. No photos, no copied artwork, no network. Two runs write byte-identical output.
+A 1024x1024 front page that sums up Tuesday 24 November 2026 in one image. The program draws the page from scratch with Python and Pillow: masthead, date line, lead story, four story cards and a closing strip, with a small pictogram drawn in code for every story and a "24 NOV 2026" date stamp in the footer. No photos, no copied artwork, no network. Two runs write byte-identical output.
 
 The six stories, all verified against reports in the 24 November 2026 news cycle:
 
@@ -22,7 +22,13 @@ python3 generate_image.py
 mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 ```
 
-`generate_image.py` writes `entry.png` (1024x1024, under 1 MiB). `main.ts` validates the PNG magic bytes and the 1 MiB limit, then copies it to `$MAKEFUN_OUTPUT_DIR` (default `/output`) as `entry.png`.
+`generate_image.py` writes `entry.png` next to itself (1024x1024, under 1 MiB). `main.ts` finds `entry.png` next to the script (or in `$MAKEFUN_BOT_DIR`), validates the PNG magic bytes and the 1 MiB limit, then copies it to `$MAKEFUN_OUTPUT_DIR` (default `/output`) as `entry.png`. It works from any working directory, including the grader's foreign cwd, because it never resolves `entry.png` against the current directory.
+
+Verify the grader-style run from a foreign directory:
+
+```sh
+cd /tmp && MAKEFUN_OUTPUT_DIR=/tmp/out node /path/to/repo/main.ts
+```
 
 Check determinism by running the generator twice and comparing hashes:
 

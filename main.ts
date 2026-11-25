@@ -1,8 +1,11 @@
 // main.ts: copy ./entry.png to $MAKEFUN_OUTPUT_DIR as entry.png.
 // Node 22, standard library only. No network, no dependencies.
+// Resolves entry.png next to this script (or $MAKEFUN_BOT_DIR),
+// so it works from any working directory, not just the repo root.
 // Validates the file exists and starts with PNG or JPEG magic bytes.
 import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const JPEG_MAGIC = Buffer.from([0xff, 0xd8, 0xff]);
@@ -12,9 +15,13 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-const source = resolve("entry.png");
+// Source directory: $MAKEFUN_BOT_DIR when set, else the folder holding main.ts.
+// The grader runs node /bot/main.ts from a foreign cwd, so a bare
+// resolve("entry.png") would look in the wrong place and fail.
+const botDir = process.env.MAKEFUN_BOT_DIR || dirname(fileURLToPath(import.meta.url));
+const source = resolve(botDir, "entry.png");
 if (!existsSync(source)) {
-  fail(`entry.png not found at ${source}. Run generate_image.py first.`);
+  fail(`entry.png not found at ${source} (searched in ${botDir}). Run generate_image.py first.`);
 }
 
 const data = readFileSync(source);
